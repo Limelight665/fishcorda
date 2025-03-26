@@ -1,1 +1,38 @@
-hai :3
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fishcord</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Fishcord</h2>
+    <!-- Profile Section -->
+    <div class="user-profile">
+      <img id="profile-pic" src="" alt="Profile Picture" />
+      <input type="file" id="profile-upload" accept="image/*" onchange="previewProfilePicFromFile(event)" />
+      <input type="text" id="username-input" placeholder="Enter your username" onchange="updateUsername()" />
+    </div>
+  </div>
+
+  <!-- Chatroom -->
+  <div class="chatroom-container">
+    <h1>Chat</h1>
+
+    <div id="message-container" class="message-container">
+      <!-- Messages will be added dynamically here -->
+    </div>
+
+    <div class="input-section">
+      <input type="text" id="message-input" placeholder="Type a message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
