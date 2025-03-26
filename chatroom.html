@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fishcord Chat</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Sidebar for User Info -->
+  <div class="sidebar">
+    <h2>Fishcord Chat</h2>
+    <img id="profile-pic-sidebar" src="" alt="Profile Picture" />
+    <p id="username-sidebar">User</p>
+  </div>
+
+  <!-- Chat Room -->
+  <div class="chatroom-container">
+    <div id="message-container" class="message-container"></div>
+    
+    <!-- Input Section -->
+    <div class="input-section">
+      <input type="text" id="message-input" placeholder="Type a message...">
+      <button type="button" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
