@@ -23,7 +23,7 @@ function updateUsername() {
     // For now, just log it to the console
     console.log("Username updated:", username);
   }
-}
+} 
 
 // Send Message Function
 function sendMessage() {
