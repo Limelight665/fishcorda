@@ -1,38 +1,819 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fishcord</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>fishcord</title>
+<link rel="icon" type="image/x-icon" href="xpfavicon.ico"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="styles.css"/>
+<script src="/socket.io/socket.io.js"></script>
+  <script>
+  // Check for a flag in localStorage (or another method) to see if the user is authenticated
+  if (!localStorage.getItem('authenticated')) {
+    window.location.href = "pass.html";
+  }
+</script>
+<style>
+body {
+  background-color: #36393f;
+  color: #dcddde;
+  font-family: 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  margin: 0;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.window {
+  background-color: #36393f;
+  border: none;
+  box-shadow: none;
+}
+
+.title-bar {
+  background-color: #202225;
+  color: #fff;
+  padding: 10px;
+}
+
+.title-bar-controls button {
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  margin-left: 5px;
+}
+
+.window-body {
+  background-color: #36393f;
+  color: #dcddde;
+  padding: 0;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #2f3136;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  background-color: #202225;
+  padding: 10px;
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.chat-messages {
+  flex-grow: 1;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background-color: #36393f;
+}
+
+.chat-input {
+  display: flex;
+  padding: 10px;
+  background-color: #40444b;
+}
+
+.chat-input input {
+  flex-grow: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  background-color: #2f3136;
+  color: white;
+}
+
+.chat-input button {
+  margin-left: 10px;
+  padding: 8px 15px;
+  background-color: #5865f2;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+}
+
+.profile-section {
+  background-color: #2f3136;
+  padding: 15px;
+  color: #dcddde;
+}
+
+.profile-input {
+  margin-bottom: 10px;
+}
+
+.profile-input label {
+  color: #b9bbbe;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.profile-input input {
+  width: 100%;
+  padding: 8px;
+  background-color: #40444b;
+  border: none;
+  border-radius: 3px;
+  color: #dcddde;
+}
+
+.online-users {
+  background-color: #2f3136;
+  margin-bottom: 15px;
+}
+
+.online-users-header {
+  background-color: #202225;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.online-user {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.online-status {
+  width: 10px;
+  height: 10px;
+  background-color: #3ba55d;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.options-window {
+  background-color: #2f3136;
+  color: #dcddde;
+}
+
+.options-window .window-body {
+  background-color: #2f3136;
+}
+
+.options-window .field-row-stacked {
+  margin-bottom: 10px;
+}
+
+.options-window label {
+  color: #b9bbbe;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: none;
+}
+
+/* Profile Photo Styling */
+.profile-photo {
+  max-width: 100px;
+  max-height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 10px 0;
+}
+
+.profile-photo-placeholder {
+  width: 100px;
+  height: 100px;
+  background-color: #40444b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin: 10px 0;
+}
+
+/* Message Styling */
+.message {
+  display: flex;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #36393f;
+}
+
+.message-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.message-content {
+  flex-grow: 1;
+}
+
+.message-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.message-author {
+  font-weight: bold;
+  margin-right: 10px;
+  color: #fff;
+}
+
+.message-time {
+  color: #72767d;
+  font-size: 0.8em;
+}
+
+.reply-btn {
+  background-color: transparent;
+  border: none;
+  color: #72767d;
+  cursor: pointer;
+  margin-left: 10px;
+}
+  .options-window {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border: 1px solid #202225;
+}
+
+.options-window .title-bar {
+  background-color: #202225;
+  color: #fff;
+}
+
+.options-window .title-bar-controls button {
+  color: #fff;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.options-window .window-body {
+  background-color: #2f3136;
+  color: #dcddde;
+  padding: 15px;
+}
+
+.options-window .field-row-stacked {
+  margin-bottom: 10px;
+}
+
+.options-window .field-row-stacked label {
+  display: flex;
+  align-items: center;
+}
+
+.options-window .field-row-stacked input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.options-window button {
+  background-color: #5865f2;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.options-window button:hover {
+  background-color: #4752c4;
+}
+
+.message-text {
+  color: #dcddde;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+  background-color: #2f3136;
+  padding: 5px 10px;
+  color: #72767d;
+  display: none;
+}
+
+.typing-indicator span:not(.typing-text) {
+  animation: typing 1.4s infinite;
+  display: inline-block;
+  margin-left: 3px;
+}
+
+@keyframes typing {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+</style>
 </head>
+<script>
+// Move the audio unlock code inside DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+document.body.addEventListener('click', function unlockAudio() {
+const notificationSound = document.getElementById('notification-sound');
+notificationSound.play().then(() => {
+notificationSound.pause();
+notificationSound.currentTime = 0;
+}).catch(err => console.log("Audio unlock error:", err));
+document.body.removeEventListener('click', unlockAudio);
+});
+});
+</script>
 <body>
+<!-- Single notification sound element -->
+<audio id="notification-sound">
+<source src="noti.mp3" type="audio/mpeg">
+</audio>
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <h2>Fishcord</h2>
-    <!-- Profile Section -->
-    <div class="user-profile">
-      <img id="profile-pic" src="" alt="Profile Picture" />
-      <input type="file" id="profile-upload" accept="image/*" onchange="previewProfilePicFromFile(event)" />
-      <input type="text" id="username-input" placeholder="Enter your username" onchange="updateUsername()" />
+<!-- Overlay for modal -->
+<div id="overlay" class="overlay"></div>
+
+<!-- Options Window -->
+<div id="optionsWindow" class="window options-window" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; width: 300px;">
+  <div class="title-bar">
+    <div class="title-bar-text">Options</div>
+    <div class="title-bar-controls">
+      <button aria-label="Close" onclick="toggleOptions()">×</button>
     </div>
   </div>
-
-  <!-- Chatroom -->
-  <div class="chatroom-container">
-    <h1>Chat</h1>
-
-    <div id="message-container" class="message-container">
-      <!-- Messages will be added dynamically here -->
+  <div class="window-body">
+    <div class="field-row-stacked">
+      <label>
+        <input type="checkbox" id="notificationSoundEnabled" checked onchange="saveOptions()">
+        Enable notification sound
+      </label>
     </div>
-
-    <div class="input-section">
-      <input type="text" id="message-input" placeholder="Type a message..." />
-      <button onclick="sendMessage()">Send</button>
+    <div class="field-row-stacked">
+      <button id="test-sound-btn">Test Sound</button>
+    </div>
+    <div class="field-row" style="display: flex; justify-content: flex-end; margin-top: 20px;">
+      <button onclick="toggleOptions()">Close</button>
     </div>
   </div>
+</div>
+<!-- Main Window -->
+<div class="window" style="width: 100%; height: 100vh;">
+<div class="title-bar">
+<div class="title-bar-text">Windows Live Messenger Chat Room (Real-time)</div>
+<div class="title-bar-controls">
+<button aria-label="Options" onclick="toggleOptions()">⚙️</button>
+<button aria-label="Minimize"></button>
+<button aria-label="Maximize"></button>
+<button aria-label="Close"></button>
+</div>
+</div>
+<div class="window-body" style="display: flex; flex-direction: column; flex: 1;">
+<div class="app">
+<div class="main-content">
+<div class="chat-section">
+<!-- Chat Messages -->
+<div class="chat-messages" id="chat-messages"></div>
+<!-- Typing Indicator -->
+<div id="typing-indicator" class="typing-indicator">
+<span id="typing-text"></span>
+<span>.</span><span>.</span><span>.</span>
+</div>
+<!-- Reply Preview (hidden by default) -->
+<div id="reply-preview" class="reply-preview" style="display: none;">
+<span id="reply-info"></span>
+<button type="button" onclick="clearReply()">×</button>
+</div>
+<!-- Chat Input -->
+<form class="chat-input" onsubmit="handleMessage(event)">
+<input type="text" id="messageInput" placeholder="Send a message" required />
+<button type="button" onclick="handleImageUrl()">Image URL</button>
+<button type="submit">Send</button>
+</form>
+</div>
+<div class="profile-section">
+<div class="online-users">
+<div class="online-users-header">Online Users</div>
+<div id="online-users-list"></div>
+</div>
+<div class="profile-header">Profile Settings</div>
+<div class="profile-input">
+<label>Name:</label>
+<input type="text" maxlength="16" id="displayName" placeholder="Enter display name" onchange="saveUserProfile()" />
+</div>
+<img id="profile-photo" class="profile-photo" style="display: none;" />
+<div id="photo-placeholder" class="profile-photo-placeholder">
+No photo set
+</div>
+<button type="button" onclick="handleProfileImageUrl()">Set Profile Image URL</button>
+</div>
+</div>
+</div>
+</div>
+</div>
 
-  <script src="script.js"></script>
+<!-- JavaScript placed at the bottom -->
+<script>
+// Global variable for reply data
+let currentReply = null;
+
+// Generate a unique user ID and store it in localStorage
+function generateUserId() {
+return '_' + Math.random().toString(36).substr(2, 9);
+}
+let userId = localStorage.getItem('userId');
+if (!userId) {
+userId = generateUserId();
+localStorage.setItem('userId', userId);
+}
+
+// Update the toggleOptions function
+function toggleOptions() {
+  const optionsWindow = document.getElementById('optionsWindow');
+  const overlay = document.getElementById('overlay');
+  
+  if (optionsWindow.style.display === 'block') {
+    optionsWindow.style.display = 'none';
+    overlay.style.display = 'none';
+  } else {
+    optionsWindow.style.display = 'block';
+    overlay.style.display = 'block';
+    loadOptions();
+  }
+}
+
+// Update the overlay click to close options
+document.getElementById('overlay').addEventListener('click', toggleOptions);
+  
+// Modified saveOptions function
+function saveOptions() {
+const soundEnabled = document.getElementById('notificationSoundEnabled').checked;
+const options = { 
+persistChat: false, // Remove dependency on non-existent persistChat checkbox
+soundEnabled 
+};
+localStorage.setItem('chatOptions', JSON.stringify(options));
+}
+// Modified loadOptions function
+function loadOptions() {
+const defaultOptions = { persistChat: false, soundEnabled: true };
+const options = JSON.parse(localStorage.getItem('chatOptions') || JSON.stringify(defaultOptions));
+
+// Only try to set persistChat if the element exists
+const persistChatEl = document.getElementById('persistChat');
+if (persistChatEl) {
+persistChatEl.checked = options.persistChat;
+}
+
+const soundEnabledEl = document.getElementById('notificationSoundEnabled');
+if (soundEnabledEl) {
+soundEnabledEl.checked = options.soundEnabled;
+}
+}
+// Chat message storage
+function saveMessages() {
+const options = JSON.parse(localStorage.getItem('chatOptions') || '{"persistChat": false}');
+if (options.persistChat) {
+const messages = document.getElementById('chat-messages').innerHTML;
+localStorage.setItem('chatMessages', messages);
+}
+}
+function loadMessages() {
+const options = JSON.parse(localStorage.getItem('chatOptions') || '{"persistChat": false}');
+if (options.persistChat) {
+const messages = localStorage.getItem('chatMessages');
+if (messages) {
+document.getElementById('chat-messages').innerHTML = messages;
+const messagesDiv = document.getElementById('chat-messages');
+messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+}
+}
+const onlineUsers = new Map(); // userId -> displayName
+
+// User profile functions
+function loadUserProfile() {
+const savedProfile = localStorage.getItem(`profile_${userId}`);
+if (savedProfile) {
+const profile = JSON.parse(savedProfile);
+document.getElementById('displayName').value = profile.displayName || 'Anonymous';
+if (profile.photoUrl) {
+const profilePhoto = document.getElementById('profile-photo');
+profilePhoto.src = profile.photoUrl;
+profilePhoto.style.display = 'block';
+document.getElementById('photo-placeholder').style.display = 'none';
+}
+}
+}
+function updateOnlineUsersList() {
+const onlineUsersDiv = document.getElementById('online-users-list');
+onlineUsersDiv.innerHTML = '';
+  
+
+onlineUsers.forEach((displayName, userId) => {
+const userDiv = document.createElement('div');
+userDiv.className = 'online-user';
+userDiv.innerHTML = `
+     <span class="online-status"></span>
+     <span>${displayName}</span>
+   `;
+onlineUsersDiv.appendChild(userDiv);
+  }); // <-- Added this closing parenthesis and brace
+}
+function emitUserUpdate() {
+const displayName = document.getElementById('displayName').value || 'Anonymous';
+socket.emit('user update', { userId, displayName });
+}
+
+function saveUserProfile() {
+const displayName = document.getElementById('displayName').value;
+const profilePhoto = document.getElementById('profile-photo');
+const photoUrl = profilePhoto.style.display !== 'none' ? profilePhoto.src : null;
+const profile = { displayName: displayName || 'Anonymous', photoUrl };
+localStorage.setItem(`profile_${userId}`, JSON.stringify(profile));
+emitUserUpdate(); // Add this line
+}
+
+// Establish Socket.io connection
+const socket = io();
+
+// Typing indicator functionality
+let typingTimer;
+const TYPING_TIMER_LENGTH = 3000;
+function emitTyping() {
+const displayName = document.getElementById('displayName').value || 'Anonymous';
+socket.emit('typing', { userId, displayName });
+}
+function emitStopTyping() {
+socket.emit('stop typing', { userId });
+}
+document.getElementById('messageInput').addEventListener('input', () => {
+clearTimeout(typingTimer);
+emitTyping();
+typingTimer = setTimeout(() => { emitStopTyping(); }, TYPING_TIMER_LENGTH);
+});
+
+// Reply functionality
+function setReply(replyData) {
+currentReply = { ...replyData, userId: replyData.userId };
+const replyPreview = document.getElementById('reply-preview');
+const replyInfo = document.getElementById('reply-info');
+if (replyData.messageText.trim().startsWith("<img")) {
+replyInfo.textContent = `Replying to ${replyData.displayName}'s image`;
+} else {
+replyInfo.textContent = `Replying to ${replyData.displayName}: "${replyData.messageText.slice(0, 50)}"`;
+}
+replyPreview.style.display = 'flex';
+}
+function setReplyFromButton(button) {
+const displayName = button.getAttribute('data-displayname');
+const messageText = button.getAttribute('data-messagetext');
+const messageUserId = button.getAttribute('data-userid');
+setReply({ displayName, messageText, userId: messageUserId });
+}
+function clearReply() {
+currentReply = null;
+document.getElementById('reply-preview').style.display = 'none';
+}
+
+// Chat message rendering and handling
+function renderMessage(data) {
+const time = data.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const replyContent = data.reply 
+? (data.reply.messageText.trim().startsWith("<img")
+? `${data.reply.displayName}'s image`
+: `${data.reply.displayName}: "${data.reply.messageText.slice(0, 50)}"`)
+: '';
+const replyHTML = data.reply ? `<div class="message-reply-preview"><em>Replying to ${replyContent}</em></div>` : '';
+return `
+    <div class="message" data-userid="${data.userId}">
+      <img class="message-avatar" src="${data.profilePhoto}" alt="${data.displayName}" />
+      <div class="message-content">
+        <div class="message-header">
+          <span class="message-author">${data.displayName}</span>
+          <span class="message-time">${time}</span>
+          <button class="reply-btn"
+            data-displayname="${data.displayName}"
+            data-messagetext="${data.messageText.replace(/"/g, '&quot;')}"
+            data-userid="${data.userId}"
+            onclick="setReplyFromButton(this)">↵</button>
+        </div>
+        ${replyHTML}
+        <div class="message-group">
+          <div class="message-text">${data.messageText}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+socket.on('chat history', (history) => {
+const messagesDiv = document.getElementById('chat-messages');
+messagesDiv.innerHTML = '';
+history.forEach((data) => {
+const lastMessageElement = messagesDiv.lastElementChild;
+const canGroup = lastMessageElement &&
+lastMessageElement.dataset.userid === data.userId &&
+data.grouped &&
+!data.reply;
+if (canGroup) {
+const messageGroup = lastMessageElement.querySelector('.message-group');
+if (messageGroup) {
+messageGroup.insertAdjacentHTML('beforeend', `<div class="message-text">${data.messageText}</div>`);
+}
+} else {
+messagesDiv.insertAdjacentHTML('beforeend', renderMessage(data));
+}
+});
+messagesDiv.scrollTop = messagesDiv.scrollHeight;
+});
+socket.on('chat message', (data) => {
+const messagesDiv = document.getElementById('chat-messages');
+typingUsers.delete(data.displayName);
+updateTypingIndicator();
+const lastMessageElement = messagesDiv.lastElementChild;
+const canGroup = lastMessageElement &&
+lastMessageElement.dataset.userid === data.userId &&
+data.grouped &&
+!data.reply;
+if (canGroup) {
+const messageGroup = lastMessageElement.querySelector('.message-group');
+if (messageGroup) {
+messageGroup.insertAdjacentHTML('beforeend', `<div class="message-text">${data.messageText}</div>`);
+}
+} else {
+messagesDiv.insertAdjacentHTML('beforeend', renderMessage(data));
+}
+messagesDiv.scrollTop = messagesDiv.scrollHeight;
+saveMessages();
+if (data.userId !== userId && data.reply) {
+if (data.reply.userId === userId) {
+const options = JSON.parse(localStorage.getItem('chatOptions') || '{"soundEnabled": true}');
+if (options.soundEnabled) {
+const notificationSound = document.getElementById('notification-sound');
+notificationSound.currentTime = 0;
+notificationSound.play().catch(error => {
+console.log("Error playing sound:", error);
+});
+}
+}
+}
+});
+socket.on('clear chat', () => {
+const messagesDiv = document.getElementById('chat-messages');
+messagesDiv.innerHTML = '';
+localStorage.removeItem('chatMessages');
+});
+const typingUsers = new Set();
+function updateTypingIndicator() {
+const typingIndicator = document.getElementById('typing-indicator');
+const typingText = document.getElementById('typing-text');
+if (typingUsers.size === 0) {
+typingIndicator.style.display = 'none';
+return;
+}
+const users = Array.from(typingUsers);
+let text = '';
+if (users.length === 1) {
+text = `${users[0]} is typing`;
+} else if (users.length === 2) {
+text = `${users[0]} and ${users[1]} are typing`;
+} else {
+text = 'Several people are typing';
+}
+typingText.textContent = text;
+typingIndicator.style.display = 'block';
+}
+socket.on('user typing', (data) => {
+typingUsers.add(data.displayName);
+updateTypingIndicator();
+});
+socket.on('user stopped typing', (data) => {
+typingUsers.delete(data.displayName);
+updateTypingIndicator();
+});
+// Online users events
+socket.on('connect', () => {
+emitUserUpdate();
+});
+
+socket.on('users online', (users) => {
+onlineUsers.clear();
+users.forEach(user => {
+onlineUsers.set(user.userId, user.displayName);
+});
+updateOnlineUsersList();
+});
+
+socket.on('user joined', (user) => {
+onlineUsers.set(user.userId, user.displayName);
+updateOnlineUsersList();
+});
+
+socket.on('user left', (userId) => {
+onlineUsers.delete(userId);
+updateOnlineUsersList();
+});
+
+socket.on('user updated', (user) => {
+onlineUsers.set(user.userId, user.displayName);
+updateOnlineUsersList();
+});
+window.addEventListener('beforeunload', () => {
+saveMessages();
+});
+loadUserProfile();
+loadOptions();
+loadMessages();
+function handleMessage(event) {
+event.preventDefault();
+clearTimeout(typingTimer);
+emitStopTyping();
+const input = document.getElementById('messageInput');
+const messageText = input.value;
+if (messageText.trim() === '/clear') {
+document.getElementById('chat-messages').innerHTML = '';
+localStorage.removeItem('chatMessages');
+input.value = '';
+return;
+}
+const displayName = document.getElementById('displayName').value || 'Anonymous';
+const profilePhotoElem = document.getElementById('profile-photo');
+const photoSrc = profilePhotoElem.style.display === 'none'
+? 'https://i.pravatar.cc/150?u=' + userId
+: profilePhotoElem.src;
+const payload = { 
+displayName, 
+messageText, 
+profilePhoto: photoSrc, 
+userId,
+reply: currentReply
+};
+socket.emit('chat message', payload);
+input.value = '';
+clearReply();
+}
+function handleImageUrl() {
+const imageUrl = prompt("Please enter the image URL:");
+if (imageUrl) {
+const displayName = document.getElementById('displayName').value || 'Anonymous';
+const profilePhotoElem = document.getElementById('profile-photo');
+const photoSrc = profilePhotoElem.style.display === 'none'
+? 'https://i.pravatar.cc/150?u=' + userId
+: profilePhotoElem.src;
+socket.emit('chat message', {
+displayName,
+messageText: `<img class="message-image" src="${imageUrl}" alt="Uploaded image">`,
+profilePhoto: photoSrc,
+userId
+});
+}
+}
+function handleProfileImageUrl() {
+const imageUrl = prompt("Please enter your profile image URL:");
+if (imageUrl) {
+const profilePhoto = document.getElementById('profile-photo');
+profilePhoto.src = imageUrl;
+profilePhoto.style.display = 'block';
+document.getElementById('photo-placeholder').style.display = 'none';
+saveUserProfile();
+}
+}
+// Attach a click handler to the “Test Sound” button once DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+const testSoundBtn = document.getElementById('test-sound-btn');
+if (testSoundBtn) {
+testSoundBtn.addEventListener('click', () => {
+const options = JSON.parse(localStorage.getItem('chatOptions') || '{"soundEnabled":true}');
+if (!options.soundEnabled) {
+console.log("Notification sound is disabled.");
+return;
+}
+const notificationSound = document.getElementById('notification-sound');
+notificationSound.currentTime = 0;
+notificationSound.play().catch(err => console.log("Test sound error:", err));
+});
+document.getElementById('test-sound-btn').addEventListener('click', () => {
+// Read the current checkbox state directly:
+const soundEnabled = document.getElementById('notificationSoundEnabled').checked;
+if (!soundEnabled) {
+console.log("Notification sound is disabled.");
+return;
+}
+const notificationSound = document.getElementById('notification-sound');
+notificationSound.currentTime = 0;
+notificationSound.play().catch(err => console.log("Test sound error:", err));
+});
+}
+});
+</script>
 </body>
 </html>
