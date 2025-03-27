@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Password Required</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="Description" content="Access restricted">
+  <link rel="stylesheet" href="https://unpkg.com/xp.css"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    body {
+      background-color: black;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .window {
+      margin: 32px;
+      width: 250px;
+    }
+    .window-body {
+      padding: 1em;
+    }
+    input {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.5em;
+    }
+    button {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 1em;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="window">
+    <div class="title-bar">
+      <div class="title-bar-text">Password Needed</div>
+    </div>
+    <div class="window-body">
+      <!-- Form to enter the password -->
+      <!-- login.html -->
+<form onsubmit="return checkPassword()">
+  <input type="password" id="password" placeholder="Enter password" required>
+  <button type="submit">Submit</button>
+</form>
+
+<script>
+  function checkPassword() {
+    const passwords = {
+      "M3l0ds": "index.html",
+      "disc0rd": "discordhtmltest.html",
+    };
+
+    const userPassword = document.getElementById('password').value;
+
+    if (passwords[userPassword]) {
+      localStorage.setItem('authenticated', 'true');
+      window.location.href = passwords[userPassword];
+    } else {
+      alert("Incorrect password. Please try again.");
+    }
+    return false;
+  }
+</script>
