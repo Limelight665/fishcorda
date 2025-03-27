@@ -7,42 +7,26 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
+    origin: "*", // Adjust this in production to allow only specific origins
   },
 });
 
 app.use(cors());
-app.use(express.static("public"));
-
-let messageHistory = []; // Store chat history
+app.use(express.static("public")); // Serve static files (if needed)
 
 io.on("connection", (socket) => {
-  console.log(`User connected: ${socket.id}`);
+  console.log("A user connected");
 
-  // Send chat history to new user
-  socket.emit("chat history", messageHistory);
-
-  // Listen for new chat messages
-  socket.on("chat message", (data) => {
-    const messageData = {
-      userId: data.userId,
-      displayName: data.displayName || "Anonymous",
-      messageText: data.messageText,
-      timestamp: new Date().toISOString(),
-    };
-
-    messageHistory.push(messageData); // Store message
-    io.emit("chat message", messageData); // Broadcast to all clients
+  socket.on("sendMessage", (data) => {
+    io.emit("receiveMessage", data); // Broadcast message to all clients
   });
 
-  // Handle user disconnect
   socket.on("disconnect", () => {
-    console.log(`User disconnected: ${socket.id}`);
+    console.log("A user disconnected");
   });
 });
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
