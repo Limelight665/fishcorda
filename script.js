@@ -1,15 +1,17 @@
+const socket = io(); // Connect to the server
+
 // Profile Picture Preview from File Input
 function previewProfilePicFromFile(event) {
   const file = event.target.files[0];
   const reader = new FileReader();
 
-  reader.onload = function() {
+  reader.onload = function () {
     const profilePic = document.getElementById("profile-pic");
-    profilePic.src = reader.result; // Set the image to the uploaded file
-  }
+    profilePic.src = reader.result;
+  };
 
   if (file) {
-    reader.readAsDataURL(file); // Read the file
+    reader.readAsDataURL(file);
   }
 }
 
@@ -17,59 +19,68 @@ function previewProfilePicFromFile(event) {
 function updateUsername() {
   const usernameInput = document.getElementById("username-input");
   const username = usernameInput.value.trim();
-  const profilePic = document.getElementById("profile-pic");
 
   if (username !== "") {
-    // For now, just log it to the console
     console.log("Username updated:", username);
+    socket.emit("user update", { userId: socket.id, displayName: username }); // Send username to the server
   }
-} 
+}
 
 // Send Message Function
 function sendMessage() {
   const messageInput = document.getElementById("message-input");
-  const messageText = messageInput.value;
-
+  const messageText = messageInput.value.trim();
   const usernameInput = document.getElementById("username-input");
-  const username = usernameInput.value.trim() || "Anonymous"; // Default to "Anonymous" if no username
+  const username = usernameInput.value.trim() || "Anonymous";
 
-  if (messageText.trim() !== "") {
-    const messageContainer = document.getElementById("message-container");
+  if (messageText !== "") {
+    const messageData = {
+      userId: socket.id,
+      displayName: username,
+      messageText: messageText,
+    };
 
-    // Create new message element
-    const messageElement = document.createElement("div");
-    messageElement.classList.add("message");
-
-    // Create profile pic and username elements
-    const avatarElement = document.createElement("img");
-    avatarElement.src = document.getElementById("profile-pic").src || "default-avatar.png"; // Default to a placeholder if no profile pic
-    avatarElement.classList.add("avatar");
-
-    const usernameElement = document.createElement("span");
-    usernameElement.classList.add("username");
-    usernameElement.textContent = username;
-
-    const textElement = document.createElement("span");
-    textElement.classList.add("text");
-    textElement.textContent = messageText;
-
-    // Create a container to hold both profile picture and username together
-    const avatarAndUsernameContainer = document.createElement("div");
-    avatarAndUsernameContainer.classList.add("avatar-username-container");
-    avatarAndUsernameContainer.appendChild(avatarElement);
-    avatarAndUsernameContainer.appendChild(usernameElement);
-
-    // Append the new elements to the message element
-    messageElement.appendChild(avatarAndUsernameContainer);
-    messageElement.appendChild(textElement);
-
-    // Append new message to container
-    messageContainer.appendChild(messageElement);
-
-    // Clear input field
+    socket.emit("chat message", messageData); // Send message to server
     messageInput.value = "";
-
-    // Scroll to the bottom of the message container
-    messageContainer.scrollTop = messageContainer.scrollHeight;
   }
+}
+
+// Listen for new messages from server
+socket.on("chat message", (data) => {
+  displayMessage(data);
+});
+
+// Load chat history
+socket.on("chat history", (history) => {
+  history.forEach(displayMessage);
+});
+
+// Append message to chat
+function displayMessage(data) {
+  const messageContainer = document.getElementById("message-container");
+  const messageElement = document.createElement("div");
+  messageElement.classList.add("message");
+
+  const avatarElement = document.createElement("img");
+  avatarElement.src = document.getElementById("profile-pic").src || "default-avatar.png";
+  avatarElement.classList.add("avatar");
+
+  const usernameElement = document.createElement("span");
+  usernameElement.classList.add("username");
+  usernameElement.textContent = data.displayName;
+
+  const textElement = document.createElement("span");
+  textElement.classList.add("text");
+  textElement.textContent = data.messageText;
+
+  const avatarAndUsernameContainer = document.createElement("div");
+  avatarAndUsernameContainer.classList.add("avatar-username-container");
+  avatarAndUsernameContainer.appendChild(avatarElement);
+  avatarAndUsernameContainer.appendChild(usernameElement);
+
+  messageElement.appendChild(avatarAndUsernameContainer);
+  messageElement.appendChild(textElement);
+
+  messageContainer.appendChild(messageElement);
+  messageContainer.scrollTop = messageContainer.scrollHeight;
 }
